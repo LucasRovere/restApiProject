@@ -7,6 +7,9 @@ Resumo do projeto
 Arquivo da versão atual:
 	apiNoDataBase.py
 
+Arquivo para testes:
+	requestTester.py
+
 Objetivo e detalhes da versão atual:
 	Versão para testar o recebimento de parâmetros junto com o request.
 	As informações serão adicionadas apenas à memória e as entidades adicionadas serão perdidas ao encerrar o processo.
@@ -22,13 +25,17 @@ Métodos do arquivo atual:
 	> Descrição: Adiciona uma nova entidade de livro à base de dados, com as informações fornecidas
 	> Url: '/book'
 	> Sucesso:
+		> 200: OK
 	> Erros:
+		> 400: Bad Request
 
 	> Método: GET
 	> Descrição: Retorna as informações do livro com o ID desejado
 	> Url: '/books/{id}'
 	> Sucesso:
+		> 200: OK
 	> Erros:
+		> 400: Bad Request
 
 Referências utilizadas:
 	>> http://flask.pocoo.org/docs/1.0/quickstart/
