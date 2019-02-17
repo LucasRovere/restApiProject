@@ -12,9 +12,12 @@ database = []
 ###################### REQUESTS #######################
 
 # POST
-@app.route('/book/', methods=['POST'])
+@app.route('/book', methods=['POST'])
 def Post():
-	resource = json.loads(request.data)
+	resource = request.args.to_dict(True)
+
+	if len(resource) == 0:
+		resource = json.loads(request.data)
 
 	# Verifica os dados obrigatórios
 	if ('title' not in resource):
