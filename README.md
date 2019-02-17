@@ -7,8 +7,8 @@ Resumo do projeto
 Arquivo da versão atual:
 	apiNoDataBase.py
 
-Arquivo para testes:
-	requestTester.py
+Arquivo para testes (requestTester.py):
+	> 
 
 Objetivo e detalhes da versão atual:
 	Versão para testar o recebimento de parâmetros junto com o request.
@@ -20,17 +20,31 @@ Objetivos das versões futuras:
 	Adicionar os livros encontrados na web à base de dados do sistema;
 	Outras funcionalidades podem ser adicionadas conforme eu tiver ideias;
 
-Métodos do arquivo atual:
-	> Método: POST
-	> Descrição: Adiciona uma nova entidade de livro à base de dados, com as informações fornecidas
-	> Url: '/book'
-	> Sucesso:
-		> 200: OK
-	> Erros:
-		> 400: Bad Request
+Formato dos dados JSON:
+	> 'title': Título do livro
+	> 'description': Descrição do livro
+	> 'isbn': Código isbn associado ao livro; chave primária
+	> 'language': Idioma do livro
 
-	> Método: GET
-	> Descrição: Retorna as informações do livro com o ID desejado
+Headers da resposta (objeto do tipo Response):
+	> 'status_code': Código de status HTTP da resposta
+	> 'code': Nome do erro associado ao código
+	> 'book': Dados de livro no formato JSON associado à resposta no método GET
+
+Métodos do arquivo atual:
+	Método: POST
+	> Descrição: Adiciona uma nova entidade de livro à base de dados, com as informações fornecidas
+	> Campos
+		>> Url: '/book'
+		>> data: Dados do livro em formato json como mostrado acima
+	> Respostas:
+		>> Sucesso:
+			>> [201: Created] Quando o post adiciona um livro com sucesso na base de dados
+		>> Erros:
+			>> [400: Bad Request] Quando há parâmetros faltando no argumento do post ou algo de errado aconteceu
+
+	Método: GET
+	> Descrição: Retorna as informações do livro com o isbn desejado
 	> Url: '/books/{id}'
 	> Sucesso:
 		> 200: OK

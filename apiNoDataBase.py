@@ -18,28 +18,42 @@ def Post():
 
 	# Verifica os dados obrigatórios
 	if ('title' not in resource):
-		return GenResponse(00, "Missing title")
+		return GenResponse(400, "Missing title", None)
 	if ('isbn' not in resource):
-		return GenResponse(400, "Missing isbn")
+		return GenResponse(400, "Missing isbn", None)
 
 	# Tenta adicionar no banco de dados
 	if (AddToDataBase(resource) == 1):
-		return GenResponse(201, "Resource Added!")
+		return GenResponse(201, "Resource Added!", None)
 	else:
-		return GenResponse(400, "Unknown Error")
+		return GenResponse(400, "Unknown Error", None)
 
 # GET
-@app.route('/books/', methods=['GET'])
-def Get():
-	return '200: OK'
+@app.route('/books/<isbn>', methods=['GET'])
+def Get(isbn):
+	requestedISBN = isbn
+	result = SearchDataBase(requestedISBN)
+
+	print(isbn)
+
+	if result == None:
+		return GenResponse(404, "Book not in DataBase", None)
+	else:
+		return GenResponse(200, "Book Found!", result)
+
+
 
 #################### AUX FUNCTIONS ####################
 
-# Gera um arquivo do tipo response com os argumentos enviados
-def GenResponse(code, type):
+# Gera um arquivo do tipo response com os argumentos enviados >>> Metodo POST
+def GenResponse(code, type, data):
 	the_response = make_response(type)
 	the_response.status_code = code
 
+	the_response.headers["book"] = data
+
+	if(code == 200):
+		the_response.headers["code"] = "OK"
 	if(code == 201):
 		the_response.headers["code"] = "Created"
 	if(code == 204):
@@ -57,6 +71,14 @@ def AddToDataBase(data):
 		return 0
 
 	return 1
+
+def SearchDataBase(isbn):
+	for book in database:
+		print("_" + str(book['isbn']) + "_" + str(isbn) + "_")
+		if  int(isbn) == int(book['isbn']):
+			return book
+
+	return None
 
 #the_response.code = "expired"
 #the_response.error_type = "expired"
