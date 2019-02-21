@@ -6,6 +6,8 @@ def main():
     urlPost2 = 'http://127.0.0.1:5000/book?title=Book+title+example&description=Book+description+example&isbn=9781617293291&language=BR'
     urlGet = 'http://127.0.0.1:5000/books/9781617293290'
     urlGet2 = 'http://127.0.0.1:5000/books/9781617293291'
+    urlGet3 = 'http://127.0.0.1:5000/books/9788692030710'
+    urlGet4 = 'http://127.0.0.1:5000/books/'
 
     data ='''{
     "title": "Book title example",
@@ -24,19 +26,33 @@ def main():
     print("Response POST 2:")
     print(response.content)
 
-    response = requests.get(urlGet)
+    #response = requests.get(urlGet)
 
-    print("Response GET 1:")
+    #print("Response GET 1:")
+    #print(response.content)
+    #print("Resource Found:")
+    #print(response.headers['book'])
+
+    #response = requests.get(urlGet2)
+
+    #print("Response GET 2:")
+    #print(response.content)
+    #print("Resource Found:")
+    #print(response.headers['book'])
+
+    response = requests.get(urlGet3)
+
+    print("Response GET 3:")
     print(response.content)
     print("Resource Found:")
     print(response.headers['book'])
 
-    response = requests.get(urlGet2)
+    response = requests.get(urlGet4)
 
-    print("Response GET 2:")
-    print(response.content)
-    print("Resource Found:")
-    print(response.headers['book'])
+    #print("Response GET 4:")
+    #print(response.content)
+    #print("Resource Found:")
+    #print(response.headers['book'])
 
 if __name__=='__main__':
     main()

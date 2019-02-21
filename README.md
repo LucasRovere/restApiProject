@@ -7,7 +7,7 @@ Resumo:
 
 Arquivo da versão atual:
 
-	apiNoDataBase.py
+	apiSearchWeb.py
 
 Arquivo para testes (requestTester.py):
 
@@ -16,17 +16,9 @@ Arquivo para testes (requestTester.py):
 
 Objetivo e detalhes da versão atual:
 
-	Versão para testar o recebimento de parâmetros junto com o request.
-	As informações serão adicionadas apenas à memória e as entidades adicionadas serão perdidas ao encerrar o processo.
-
-Objetivos das versões futuras:
-
-	Salvar em disco as informações adicionadas em disco para acesso;
 	Acessar o site https://kotlinlang.org/docs/books.html para busca adicional de livros não presentes na base de dados;
-	Adicionar os livros encontrados na web à base de dados do sistema;
-	Outras funcionalidades podem ser adicionadas conforme eu tiver ideias;
 
-Formato dos dados JSON:
+Formato de dados dos livros JSON:
 
 	> 'title': Título do livro
 	> 'description': Descrição do livro
@@ -65,8 +57,10 @@ Referências utilizadas:
 	>> http://flask.pocoo.org/docs/1.0/quickstart/
 	>> https://blog.miguelgrinberg.com/post/designing-a-restful-api-with-python-and-flask
 	>> https://bocoup.com/blog/documenting-your-api
+	>> https://www.crummy.com/software/BeautifulSoup/bs4/doc/#searching-the-tree
 
 Arquivos antigos:
 
 	> helloWorld.py: É obrigatório programar um helloWorld quando se usa uma nova ferramente pela primeira vez
 	> apiBasics.py: Arquivo de teste para realizar outras funções além de hello world; requests sem body
+	> apiNoDataBase.py: Realiza POST e GET porém sem utilizar uma base de dados e sem buscar dados na web
