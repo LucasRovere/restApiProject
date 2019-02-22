@@ -8,12 +8,10 @@ from bs4 import BeautifulSoup
 import requests
 import re
 
-app = Flask(__name__)
-
 database = []
+hasSearchedKotlin = False
 
-# Falta:
-# https://kotlinandroidbook.com/
+app = Flask(__name__)
 
 ###################### REQUESTS #######################
 
@@ -35,33 +33,46 @@ def Post():
 	if (AddToDataBase(resource) == 1):
 		return GenResponse(201, "Resource Added!", None)
 	else:
-		return GenResponse(400, "Unknown Error", None)
+		return GenResponse(500, "Unknown Error", None)
 
 # GET
 @app.route('/books/<isbn>', methods=['GET'])
 def Get(isbn):
+	SearchKotlinDB()
+
 	requestedISBN = isbn
 	result = SearchDataBase(requestedISBN)
 
-	if result == None:
-		return GenResponse(404, "Book not in DataBase", None)
-	else:
-		return GenResponse(200, "Book Found!", result)
+	return GenResponse(200, "", result)
 
 @app.route('/books/', methods=['GET'])
 def GetAll():
 	SearchKotlinDB()
-	return GenResponse(404, "Book not in DataBase", None)
+	
+	return GenResponse(200, "", database)
 
 ##################### WEB SEARCH ######################
 
 # Busca os links do site kotlinlang
 def SearchKotlinDB():
+	global hasSearchedKotlin
+
+	# Variável global "hasSearchedKotlin" mostra se os livros encontrados
+	# na página já foram buscados e adicionados na base de dados;
+	# Evitando buscas desnecessárias
+	if hasSearchedKotlin == True:
+		return
+	else:
+		hasSearchedKotlin = True
+
+	# Recupera o html da página do kotlin
 	kotlinPage = requests.get("https://kotlinlang.org/docs/books.html")
 
+	# Verifica se a página foi carregada com sucesso antes de continuar
 	if kotlinPage.status_code != 200:
 		return None
 
+	# Converte o html em uma bela sopa para facilitar a navegação
 	kotlinSoup = BeautifulSoup(kotlinPage.content, 'html.parser')
 
 	# Os links e títulos de livros estão dentro da tag "article"
@@ -78,21 +89,42 @@ def SearchKotlinDB():
 	bookList = article.find_all("h2")
 	isbnList = []
 
+	# Para cada tag de título encontrada (para cada livro)
+	# encontra as informações no site e busca o isbn pelo link externo de compra
 	for titleTag in bookList:
+		# Encontra as informações seguindo a organização de tags mostrada acima
 		langTag = titleTag.next_sibling.next_sibling
 		imageTag = langTag.next_sibling.next_sibling
+
 		url = imageTag['href']
 
-		print("\tSearch at " + url)
-
 		urlIsbn = SearchIsbnAt(url)
-		print("Found isbn = " + str(urlIsbn))
+		descripton = GetDescription(imageTag)
+		language = langTag.get_text()
+		title = titleTag.get_text()
 
+		if urlIsbn == -1:
+			isbnString = "Unavailiable"
+		else:
+			isbnString = str(urlIsbn)
+
+		data = {
+			"title" : title,
+			"descripton" : descripton,
+			"language" : language,
+			"isbn" : isbnString
+		}
+
+		AddToDataBase(data)
+
+# Busca o isbn numa url
 def SearchIsbnAt(url):
 	headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.101 Safari/537.36'}
 	cookies = {'enwiki_session': '17ab96bd8ffbe8ca58a78657a918558'}
 	bookPage = requests.get(url, headers=headers, cookies=cookies)
 	bookSoup = BeautifulSoup(bookPage.content, 'html5lib')
+
+	print("Search at " + url)
 
 	if "manning" in url:
 		return GetIsbnManning(bookSoup)
@@ -116,7 +148,7 @@ def SearchIsbnAt(url):
 	return -1
 
 ################### CASOS CONHECIDOS ##################
-# table-row table-body-row prd_custom_fields_0
+
 def GetIsbnManning(pageSoup):
 	try:
 		productInfo = pageSoup.find(class_="product-info")
@@ -163,9 +195,12 @@ def GetIsbnFundamentalKotlin(pageSoup):
 		return -1
 
 def GetIsbnKuramkitap(pageSoup):
-	codeInfo = pageSoup.find(class_="table-row table-body-row prd_custom_fields_0")
-	codeText = codeInfo.get_text()
-	return int(re.search(r'\d+', codeText).group())
+	try:
+		codeInfo = pageSoup.find(class_="table-row table-body-row prd_custom_fields_0")
+		codeText = codeInfo.get_text()
+		return int(re.search(r'\d+', codeText).group())
+	except:
+		return -1
 
 #################### AUX FUNCTIONS ####################
 
@@ -199,8 +234,23 @@ def AddToDataBase(data):
 # Busca a base de dados local pelo código isbn
 def SearchDataBase(isbn):
 	for book in database:
-		print("_" + str(book['isbn']) + "_" + str(isbn) + "_")
-		if  int(isbn) == int(book['isbn']):
+		if  str(isbn) == str(book['isbn']):
 			return book
 
 	return None
+
+# Descrição como string
+def GetDescription(currentTag):
+	try:
+		currentTag = currentTag.next_sibling.next_sibling
+		description = ""
+
+		while currentTag.name == "p":
+			description += currentTag.get_text()
+			currentTag = currentTag.next_sibling.next_sibling		
+
+		# Algumas descrições vem com caracteres que precisam ser removidos
+		return description.encode('latin-1', 'ignore')
+
+	except:
+		return ""

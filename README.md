@@ -11,6 +11,7 @@ Arquivo da versão atual:
 
 Arquivo para testes (requestTester.py):
 
+	> Testa todos os casos da api; mais explicações no arquivo
 	> Basta rodar o arquivo no mesmo computador rodando o servidor
 	> Caso nescessário a url deve ser alterada diretamente no script
 
@@ -34,10 +35,20 @@ Headers da resposta (objeto do tipo Response):
 Métodos do arquivo atual:
 
 	Método: POST
-	> Descrição: Adiciona uma nova entidade de livro à base de dados, com as informações fornecidas
+	> Descrição: Adiciona uma nova entidade de livro à base de dados, com as informações fornecidas; Recebe parâmetros pelo campo 'data' do request
 	> Campos
 		>> Url: '/book'
 		>> data: Dados do livro em formato json como mostrado acima
+	> Respostas:
+		>> Sucesso:
+			>> [201: Created] Quando o post adiciona um livro com sucesso na base de dados
+		>> Erros:
+			>> [400: Bad Request] Quando há parâmetros faltando no argumento do post ou algo de errado aconteceu
+
+	Método: POST
+	> Descrição: Adiciona uma nova entidade de livro à base de dados, com as informações fornecidas; Recebe parâmetros pela url
+	> Campos
+		>> Url: '/book?title=Book+title+example&description=Book+description+example&isbn=9999999999999&language=BR'
 	> Respostas:
 		>> Sucesso:
 			>> [201: Created] Quando o post adiciona um livro com sucesso na base de dados
@@ -48,9 +59,13 @@ Métodos do arquivo atual:
 	> Descrição: Retorna as informações do livro com o isbn desejado
 	> Url: '/books/{id}'
 	> Sucesso:
-		> 200: OK
-	> Erros:
-		> 400: Bad Request
+		> [200: OK] Dados JSON encontrados no header 'book'
+
+	Método: GET
+	> Descrição: Retorna as informações de todos os livros na base de dados
+	> Url: '/books/'
+	> Sucesso:
+		> [200: OK] Dados JSON encontrados no header 'book'
 
 Referências utilizadas:
 
