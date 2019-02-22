@@ -12,6 +12,9 @@ app = Flask(__name__)
 
 database = []
 
+# Falta:
+# https://kotlinandroidbook.com/
+
 ###################### REQUESTS #######################
 
 # POST
@@ -86,14 +89,9 @@ def SearchKotlinDB():
 		print("Found isbn = " + str(urlIsbn))
 
 def SearchIsbnAt(url):
-	###########
-	if "amazon" not in url:
-		return -1
-	##########
-
 	headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.101 Safari/537.36'}
-	bookPage = requests.get(url, headers=headers)
-	#bookSoup = BeautifulSoup(bookPage.content, 'html.parser')
+	cookies = {'enwiki_session': '17ab96bd8ffbe8ca58a78657a918558'}
+	bookPage = requests.get(url, headers=headers, cookies=cookies)
 	bookSoup = BeautifulSoup(bookPage.content, 'html5lib')
 
 	if "manning" in url:
@@ -104,23 +102,31 @@ def SearchIsbnAt(url):
 		return GetIsbnPacktpub(bookSoup)
 	if "amazon" in url:
 		return GetIsbnAmazon(bookSoup)
+	if "fundamental-kotlin" in url:
+		return GetIsbnFundamentalKotlin(bookSoup)
+	if "kuramkitap" in url:
+		return GetIsbnKuramkitap(bookSoup)
+	if "raywenderlich" in url:
+		return -1
+	if "editions-eni" in url:
+		return -1
+	if "kotlinandroidbook" in url:
+		return -1
 
 	return -1
 
 ################### CASOS CONHECIDOS ##################
-
+# table-row table-body-row prd_custom_fields_0
 def GetIsbnManning(pageSoup):
 	try:
 		productInfo = pageSoup.find(class_="product-info")
-		isbnInt = -1
 
 		for tag in productInfo.find_all("li"):
 			tagText = tag.get_text()
-
 			if "ISBN" in tagText:
-				isbnInt = int(re.search(r'\d+', tagText).group())
+				return int(re.search(r'\d+', tagText).group())
 
-		return isbnInt
+		return -1
 	except:
 		return -1
 
@@ -133,11 +139,33 @@ def GetIsbnPacktpub(pageSoup):
 		return -1
 
 def GetIsbnAmazon(pageSoup):
-	productInfo = pageSoup.find_all("table")
-	print(len(productInfo))
-	#isbnInfo = pageSoup.find("b", string="ISBN-13")
-	#print(productInfo)
+	try:
+		productInfo = pageSoup.find("table", id="productDetailsTable")
+		
+		for tag in productInfo.find_all("li"):
+			tagText = tag.get_text()
+			if "ISBN-13" in tagText:
+				tagText = tagText.replace("ISBN-13", "").replace("-", "")
+				return int(re.search(r'\d+', tagText).group())
 
+		return -1
+	except:
+		return -1
+
+def GetIsbnFundamentalKotlin(pageSoup):
+	try:
+		productInfo = pageSoup.find(class_="scondary_content")
+
+		for tag in productInfo.find_all("h2"):
+			if "ISBN" in tag.get_text():
+				return int(re.search(r'\d+', tag.get_text()).group())
+	except:
+		return -1
+
+def GetIsbnKuramkitap(pageSoup):
+	codeInfo = pageSoup.find(class_="table-row table-body-row prd_custom_fields_0")
+	codeText = codeInfo.get_text()
+	return int(re.search(r'\d+', codeText).group())
 
 #################### AUX FUNCTIONS ####################
 
