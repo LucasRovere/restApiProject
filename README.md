@@ -5,19 +5,24 @@ Resumo:
 	O arquivo readme define qual é o arquivo com a versão mais completa e como utilizar a API
 	Os arquivos antigos são mantidos no repositório como histórico de construção do projeto
 
-Arquivo da versão atual:
+Arquivos da versão atual:
 
-	apiSearchWeb.py
+	apiDataBase.py (Aplicativo Flask)
+	WebSearcher.py (classe auxiliar; Vasculha https://kotlinlang.org/docs/books.html em busca dos dados dos livros)
+	DAO.py (classe auxiliar; acesso à base de dados)
 
-Arquivo para testes (requestTester.py):
+	Para rodar:	export FLASK_APP=apiDataBase.py
+				flask run
 
+Arquivo para testes:
+
+	> requestTester.py
 	> Testa todos os casos da api; mais explicações no arquivo
 	> Basta rodar o arquivo no mesmo computador rodando o servidor
 	> Caso nescessário a url deve ser alterada diretamente no script
 
-Objetivo e detalhes da versão atual:
-
-	Acessar o site https://kotlinlang.org/docs/books.html para busca adicional de livros não presentes na base de dados;
+	Para rodar:	python requestTester.py
+	* Enquanto o aplicativo flask estiver rodando
 
 Formato de dados dos livros JSON:
 
@@ -67,6 +72,11 @@ Métodos do arquivo atual:
 	> Sucesso:
 		> [200: OK] Dados JSON encontrados no header 'book'
 
+Pacotes python externos utilizados:
+
+	> Flask
+	> BeautifulSoup
+
 Referências utilizadas:
 
 	>> http://flask.pocoo.org/docs/1.0/quickstart/
@@ -79,3 +89,4 @@ Arquivos antigos:
 	> helloWorld.py: É obrigatório programar um helloWorld quando se usa uma nova ferramente pela primeira vez
 	> apiBasics.py: Arquivo de teste para realizar outras funções além de hello world; requests sem body
 	> apiNoDataBase.py: Realiza POST e GET porém sem utilizar uma base de dados e sem buscar dados na web
+	> apiSearchWeb.py: POST e GET, realizando busca na web para completar a base de dados
