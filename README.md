@@ -72,7 +72,12 @@ Métodos do arquivo atual:
 	> Sucesso:
 		> [200: OK] Dados JSON encontrados no header 'book'
 
-Pacotes python externos utilizados:
+Base de Dados:
+
+	A base de dados foi simulada através da biblioteca SQLite3 do python.
+	Os dados ficam salvos em um arquivo 'book.db' no diretório do aplicativo.
+
+Pacotes python instalados:
 
 	> Flask
 	> BeautifulSoup

@@ -73,6 +73,8 @@ class DAO:
 
 		return self.ToJson(data)
 
+	# Converte os dados buscados da tabela (em uma lista)
+	# para um JSON com os campos padronizados
 	def ToJson(self, data):
 		try:
 			toDict = self.ToDict(data)
@@ -80,6 +82,8 @@ class DAO:
 		except:
 			return ""
 
+	# Converte os dados buscados da tabela (em uma lista de listas)
+	# para um JSON com os campos padronizados; resposta formatada
 	def ListToJson(self, data):
 		dataDict = {'numberBooks' : len(data)}
 
@@ -91,6 +95,8 @@ class DAO:
 
 		return json.dumps(dataDict)
 
+	# Converte os dados buscados da tabela (em uma lista)
+	# para um dicionário com os campos padronizados
 	def ToDict(self, data):
 		toDict = {}
 		

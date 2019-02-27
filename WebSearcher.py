@@ -8,6 +8,9 @@ class WebSearcher:
 
 	# Busca os links do site kotlinlang
 	def SearchKotlinDB(self):
+		# Informação
+		print("Empty Database:\nSearching kotlinlang")
+
 		# Recupera o html da página do kotlin
 		kotlinPage = requests.get("https://kotlinlang.org/docs/books.html")
 
@@ -43,6 +46,11 @@ class WebSearcher:
 
 			url = imageTag['href']
 
+			# Informação
+			print("Searching [" + str(bookList.index(titleTag) + 1) + "/" + str(len(bookList)) + "]")
+			print("\tURL: " + url)
+
+			# Salva os dados encontrados dos livros em strings separadas
 			urlIsbn = self.SearchIsbnAt(url)
 			description = self.GetDescription(imageTag)
 			language = langTag.get_text()
@@ -66,11 +74,14 @@ class WebSearcher:
 
 	# Busca o isbn numa url
 	def SearchIsbnAt(self, url):
+		# Alguns sites da lista bloqueiam requisições sem headers com no mínimo dados de usuário e/ou cookies
 		headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.101 Safari/537.36'}
 		cookies = {'enwiki_session': '17ab96bd8ffbe8ca58a78657a918558'}
 		bookPage = requests.get(url, headers=headers, cookies=cookies)
 		bookSoup = BeautifulSoup(bookPage.content, 'html5lib')
 
+		# Verifica o site em questão para decidir o método apropriado para recuperar o isbn
+		# Alguns sites não tem a informação do isbn por isso nem são verificados
 		if "manning" in url:
 			return self.GetIsbnManning(bookSoup)
 		if "leanpub" in url:
@@ -95,58 +106,25 @@ class WebSearcher:
 	# Descrição como string
 	def GetDescription(self, currentTag):
 		try:
+			# Recupera a primeira tag <p> contendo descrição
 			currentTag = currentTag.next_sibling.next_sibling
 			description = ""
 
+			# Alguns livros ustilizam mais de uma tag <p> em sequencia para a descrição.
+			# Após todas as descrições a próxima tag será <h2> com o título do próximo livro.
 			while currentTag.name == "p":
 				description += currentTag.get_text()
 				currentTag = currentTag.next_sibling.next_sibling		
 
 			# Algumas descrições vem com caracteres que precisam ser removidos
-			return description.encode('latin-1', 'ignore').replace('\n', ' ').replace('\t', ' ')
+			description = description.replace('\n', ' ').replace('\t', ' ')
+			return description
 
 		except:
-			return ""
+			# Caso ocorra algum erro inesperado o default 'Unavailiable' será retornado
+			return "Unavailiable"
 
 ################### CASOS CONHECIDOS ##################
-
-
-	# def GetIsbnManning(self, pageSoup):
-	# 	productInfo = pageSoup.find(class_="product-info")
-
-	# 	for tag in productInfo.find_all("li"):
-	# 		tagText = tag.get_text()
-	# 		if "ISBN" in tagText:
-	# 			return int(re.search(r'\d+', tagText).group())
-	# 	return -1
-
-	# def GetIsbnPacktpub(self, pageSoup):
-	# 	isbnString = pageSoup.find(itemprop="isbn").get_text()
-	# 	isbnInt = int(re.search(r'\d+', isbnString).group())
-	# 	return isbnInt
-
-	# def GetIsbnAmazon(self, pageSoup):
-	# 	productInfo = pageSoup.find("table", id="productDetailsTable")
-		
-	# 	for tag in productInfo.find_all("li"):
-	# 		tagText = tag.get_text()
-	# 		if "ISBN-13" in tagText:
-	# 			tagText = tagText.replace("ISBN-13", "").replace("-", "")
-	# 			return int(re.search(r'\d+', tagText).group())
-
-	# 	return -1
-
-	# def GetIsbnFundamentalKotlin(self, pageSoup):
-	# 	productInfo = pageSoup.find(class_="scondary_content")
-
-	# 	for tag in productInfo.find_all("h2"):
-	# 		if "ISBN" in tag.get_text():
-	# 			return int(re.search(r'\d+', tag.get_text()).group())
-
-	# def GetIsbnKuramkitap(self, pageSoup):
-	# 	codeInfo = pageSoup.find(class_="table-row table-body-row prd_custom_fields_0")
-	# 	codeText = codeInfo.get_text()
-	# 	return int(re.search(r'\d+', codeText).group())
 
 	def GetIsbnManning(self, pageSoup):
 		try:
