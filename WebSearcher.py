@@ -2,6 +2,7 @@
 from bs4 import BeautifulSoup
 import sqlite3
 import requests
+import re
 
 class WebSearcher:
 
@@ -43,7 +44,7 @@ class WebSearcher:
 			url = imageTag['href']
 
 			urlIsbn = self.SearchIsbnAt(url)
-			descripton = self.GetDescription(imageTag)
+			description = self.GetDescription(imageTag)
 			language = langTag.get_text()
 			title = titleTag.get_text()
 
@@ -110,6 +111,44 @@ class WebSearcher:
 			return ""
 
 ################### CASOS CONHECIDOS ##################
+
+
+	# def GetIsbnManning(self, pageSoup):
+	# 	productInfo = pageSoup.find(class_="product-info")
+
+	# 	for tag in productInfo.find_all("li"):
+	# 		tagText = tag.get_text()
+	# 		if "ISBN" in tagText:
+	# 			return int(re.search(r'\d+', tagText).group())
+	# 	return -1
+
+	# def GetIsbnPacktpub(self, pageSoup):
+	# 	isbnString = pageSoup.find(itemprop="isbn").get_text()
+	# 	isbnInt = int(re.search(r'\d+', isbnString).group())
+	# 	return isbnInt
+
+	# def GetIsbnAmazon(self, pageSoup):
+	# 	productInfo = pageSoup.find("table", id="productDetailsTable")
+		
+	# 	for tag in productInfo.find_all("li"):
+	# 		tagText = tag.get_text()
+	# 		if "ISBN-13" in tagText:
+	# 			tagText = tagText.replace("ISBN-13", "").replace("-", "")
+	# 			return int(re.search(r'\d+', tagText).group())
+
+	# 	return -1
+
+	# def GetIsbnFundamentalKotlin(self, pageSoup):
+	# 	productInfo = pageSoup.find(class_="scondary_content")
+
+	# 	for tag in productInfo.find_all("h2"):
+	# 		if "ISBN" in tag.get_text():
+	# 			return int(re.search(r'\d+', tag.get_text()).group())
+
+	# def GetIsbnKuramkitap(self, pageSoup):
+	# 	codeInfo = pageSoup.find(class_="table-row table-body-row prd_custom_fields_0")
+	# 	codeText = codeInfo.get_text()
+	# 	return int(re.search(r'\d+', codeText).group())
 
 	def GetIsbnManning(self, pageSoup):
 		try:

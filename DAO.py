@@ -9,45 +9,46 @@ class DAO:
 		cursor = connect.cursor()
 		cursor.execute("PRAGMA table_info(book)")
 		checkTable = cursor.fetchall()
+		# Se a tabela não existir, o sistema cria e popula com os dados do kotlin
+		if len(checkTable) == 0:
+			cursor.execute(" CREATE TABLE book ( id integer primary key, isbn text, title text, description text, language text)")
+			connect.commit()
+			connect.close()
 
-		print("===========================")
-		print(checkTable)
-		print("===========================")
-
-		cursor.execute(" CREATE TABLE book ( isbn integer, title text, description text, language text)")
-		connect.commit()
-		connect.close()
-
-		ws = WebSearcher()
-		AddList(ws.SearchKotlinDB())
+			ws = WebSearcher()
+			self.AddList(ws.SearchKotlinDB())
 
 	def AddList(self, data):
-		connect = sqlite3.connect('book.db')
-		cursor = connect.cursor()
+		try:
+			connect = sqlite3.connect('book.db')
+			cursor = connect.cursor()
 
-		sqlString = "INSERT INTO BOOK (isbn, title, description, language) VALUES "
+			sqlString = "INSERT INTO BOOK (isbn, title, description, language) VALUES (:isbn, :title, :description, :language)"
 
-		for book in data:
-			sqlString += "(" + str(book['isbn']) + ", '" + str(book['title']) + "', '" + str(book['description']) + "', '" + str(book['language']) + "'" + "), "
+			cursor.executemany(sqlString, data)
+			connect.commit()
+			connect.close()
 
-		sqlString = sqlString[:-2]
+			return True
 
-		print("===========================")
-		print(sqlString)
-		print("===========================")
+		except:
+			return False
 
-		return cursor.execute(sqlString)
+	def AddSingle(self, data):
+		try:
+			connect = sqlite3.connect('book.db')
+			cursor = connect.cursor()
 
-	def AddSingle(self, book):
-		connect = sqlite3.connect('book.db')
-		cursor = connect.cursor()
+			sqlString = "INSERT INTO BOOK (isbn, title, description, language) VALUES (:isbn, :title, :description, :language)"
 
-		sqlString = "INSERT INTO BOOK (isbn, title, description, language) VALUES "
-		sqlString += "(" + str(book['isbn']) + ", '" + str(book['title']) + "', '" + str(book['description']) + "', '" + str(book['language']) + "'" + ") "
+			cursor.execute(sqlString, data)
+			connect.commit()
+			connect.close()
 
-		cursor.execute(sqlString)
-		connect.commit()
-		connect.close()
+			return True
+
+		except:
+			return False
 
 	def GetAll(self):
 		connect = sqlite3.connect('book.db')
@@ -55,7 +56,7 @@ class DAO:
 
 		sqlString = "SELECT * FROM BOOK"
 		data = cursor.execute(sqlString)
-		connect.commit()
+		data = cursor.fetchall()
 		connect.close()
 
 		return data
@@ -65,8 +66,8 @@ class DAO:
 		cursor = connect.cursor()
 
 		sqlString = "SELECT * FROM BOOK WHERE isbn=" + str(isbn)
-		data = cursor.execute(sqlString)
-		connect.commit()
+		cursor.execute(sqlString)
+		data = cursor.fetchall()
 		connect.close()
 
 		return data
