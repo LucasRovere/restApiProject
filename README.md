@@ -24,12 +24,47 @@ Arquivo para testes:
 	Para rodar:	python requestTester.py
 	* Enquanto o aplicativo flask estiver rodando
 
-Formato de dados dos livros JSON:
+Formato de dados dos livros JSON POST (enviado pelo cliente):
 
-	> 'title': Título do livro
-	> 'description': Descrição do livro
-	> 'isbn': Código isbn associado ao livro; chave primária
-	> 'language': Idioma do livro
+	{
+		'title': Título do livro
+		'description': Descrição do livro
+		'isbn': Código isbn associado ao livro; chave primária
+		'language': Idioma do livro
+	}
+
+Formato de dados dos livros JSON GET (resposta do servidor):
+
+	{
+		'id' : Chave do livro na base de dados
+		'title': Título do livro
+		'description': Descrição do livro
+		'isbn': Código isbn associado ao livro; chave primária
+		'language': Idioma do livro
+	}
+
+Formato de dados dos livros JSON GET ALL (resposta do servidor):
+
+	{
+		'numberBooks' : Número de livros encontrados
+		'books' : [
+					{
+						'id' : Chave do livro na base de dados
+						'title': Título do livro
+						'description': Descrição do livro
+						'isbn': Código isbn associado ao livro; chave primária
+						'language': Idioma do livro
+					}
+					...
+					{
+						'id' : Chave do livro na base de dados
+						'title': Título do livro
+						'description': Descrição do livro
+						'isbn': Código isbn associado ao livro; chave primária
+						'language': Idioma do livro
+					}
+				]
+	}
 
 Headers da resposta (objeto do tipo Response):
 
@@ -41,6 +76,7 @@ Métodos do arquivo atual:
 
 	Método: POST
 	> Descrição: Adiciona uma nova entidade de livro à base de dados, com as informações fornecidas; Recebe parâmetros pelo campo 'data' do request
+	> Observação: não verifica se os livros já estão na base de dados
 	> Campos
 		>> Url: '/book'
 		>> data: Dados do livro em formato json como mostrado acima
@@ -52,6 +88,7 @@ Métodos do arquivo atual:
 
 	Método: POST
 	> Descrição: Adiciona uma nova entidade de livro à base de dados, com as informações fornecidas; Recebe parâmetros pela url
+	> Observação: não verifica se os livros já estão na base de dados
 	> Campos
 		>> Url: '/book?title=Book+title+example&description=Book+description+example&isbn=9999999999999&language=BR'
 	> Respostas:
@@ -76,6 +113,7 @@ Base de Dados:
 
 	A base de dados foi simulada através da biblioteca SQLite3 do python.
 	Os dados ficam salvos em um arquivo 'book.db' no diretório do aplicativo.
+	Os dados do kotlinlang são carregados apenas quando o arquivo 'book.bd' não existir (ou não tiver a tabela 'book')
 
 Pacotes python instalados:
 

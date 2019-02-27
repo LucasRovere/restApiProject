@@ -23,8 +23,10 @@ dao = DAO()
 # POST
 @app.route('/book', methods=['POST'])
 def Post():
+	# Converte os parâmetros url para um dicionário python
 	resource = request.args.to_dict(True)
 
+	# Caso os parâmetros não estejam na url, procura no corpo do request
 	if len(resource) == 0:
 		resource = json.loads(request.data)
 
@@ -46,6 +48,7 @@ def Get(isbn):
 	result = dao.Get(isbn)
 	return GenResponse(200, "", result)
 
+# GET ALL
 @app.route('/books/', methods=['GET'])
 def GetAll():
 	result = dao.GetAll()
