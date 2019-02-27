@@ -4,11 +4,12 @@ from flask import Flask
 from flask import request
 from flask import json
 from flask import make_response
+
 from bs4 import BeautifulSoup
+
 import requests
 import re
 
-from WebSearcher import WebSearcher
 from DAO import DAO
 
 database = []
@@ -34,7 +35,7 @@ def Post():
 		return GenResponse(400, "Missing isbn", None)
 
 	# Tenta adicionar no banco de dados
-	if (AddToDataBase(resource) == 1):
+	if (dao.AddSingle(resource)):
 		return GenResponse(201, "Resource Added!", None)
 	else:
 		return GenResponse(500, "Unknown Error", None)
@@ -42,34 +43,15 @@ def Post():
 # GET
 @app.route('/books/<isbn>', methods=['GET'])
 def Get(isbn):
-	CheckKotlinDB()
 	result = dao.Get(isbn)
-
 	return GenResponse(200, "", result)
 
 @app.route('/books/', methods=['GET'])
 def GetAll():
-	CheckKotlinDB()
 	result = dao.GetAll()
-	
 	return GenResponse(200, "", result)
 
 #################### AUX FUNCTIONS ####################
-
-def CheckKotlinDB():
-	global hasSearchedKotlin
-
-	# Variável global "hasSearchedKotlin" mostra se os livros encontrados
-	# na página já foram buscados e adicionados na base de dados;
-	# Evitando buscas desnecessárias
-	if hasSearchedKotlin == True:
-		return
-	else:
-		hasSearchedKotlin = True
-
-	ws = WebSearcher()
-	foundData = ws.SearchKotlinDB()
-	dao.AddList(foundData)
 
 # Gera um arquivo do tipo response com os argumentos enviados >>> Metodo POST
 def GenResponse(code, type, data):
@@ -88,28 +70,3 @@ def GenResponse(code, type, data):
 		the_response.headers["code"] = "Bad Request"
 
 	return the_response
-
-# Adiciona novo recurso na memória
-def AddToDataBase(data):
-	try:
-		database.append(data)
-	except:
-		return 0
-
-	return 1
-
-# Descrição como string
-def GetDescription(currentTag):
-	try:
-		currentTag = currentTag.next_sibling.next_sibling
-		description = ""
-
-		while currentTag.name == "p":
-			description += currentTag.get_text()
-			currentTag = currentTag.next_sibling.next_sibling		
-
-		# Algumas descrições vem com caracteres que precisam ser removidos
-		return description.encode('latin-1', 'ignore')
-
-	except:
-		return ""

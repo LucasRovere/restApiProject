@@ -23,8 +23,6 @@ def main():
     "language": "BR"
     }'''
 
-    print("Posting")
-
     response = requests.post(urlPost, data=data)
     print("Response POST 1:")
     print(response.content)

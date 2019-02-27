@@ -1,10 +1,12 @@
 
+from bs4 import BeautifulSoup
 import sqlite3
+import requests
 
 class WebSearcher:
 
 	# Busca os links do site kotlinlang
-	def SearchKotlinDB():
+	def SearchKotlinDB(self):
 		# Recupera o html da página do kotlin
 		kotlinPage = requests.get("https://kotlinlang.org/docs/books.html")
 
@@ -40,8 +42,8 @@ class WebSearcher:
 
 			url = imageTag['href']
 
-			urlIsbn = SearchIsbnAt(url)
-			descripton = GetDescription(imageTag)
+			urlIsbn = self.SearchIsbnAt(url)
+			descripton = self.GetDescription(imageTag)
 			language = langTag.get_text()
 			title = titleTag.get_text()
 
@@ -52,7 +54,7 @@ class WebSearcher:
 
 			data = {
 				"title" : title,
-				"descripton" : descripton,
+				"description" : description,
 				"language" : language,
 				"isbn" : isbnString
 			}
@@ -62,7 +64,7 @@ class WebSearcher:
 		return foundData
 
 	# Busca o isbn numa url
-	def SearchIsbnAt(url):
+	def SearchIsbnAt(self, url):
 		headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.101 Safari/537.36'}
 		cookies = {'enwiki_session': '17ab96bd8ffbe8ca58a78657a918558'}
 		bookPage = requests.get(url, headers=headers, cookies=cookies)
@@ -71,17 +73,17 @@ class WebSearcher:
 		print("Search at " + url)
 
 		if "manning" in url:
-			return GetIsbnManning(bookSoup)
+			return self.GetIsbnManning(bookSoup)
 		if "leanpub" in url:
 			return -1
 		if "packtpub" in url:
-			return GetIsbnPacktpub(bookSoup)
+			return self.GetIsbnPacktpub(bookSoup)
 		if "amazon" in url:
-			return GetIsbnAmazon(bookSoup)
+			return self.GetIsbnAmazon(bookSoup)
 		if "fundamental-kotlin" in url:
-			return GetIsbnFundamentalKotlin(bookSoup)
+			return self.GetIsbnFundamentalKotlin(bookSoup)
 		if "kuramkitap" in url:
-			return GetIsbnKuramkitap(bookSoup)
+			return self.GetIsbnKuramkitap(bookSoup)
 		if "raywenderlich" in url:
 			return -1
 		if "editions-eni" in url:
@@ -92,7 +94,7 @@ class WebSearcher:
 		return -1
 
 	# Descrição como string
-	def GetDescription(currentTag):
+	def GetDescription(self, currentTag):
 		try:
 			currentTag = currentTag.next_sibling.next_sibling
 			description = ""
@@ -109,7 +111,7 @@ class WebSearcher:
 
 ################### CASOS CONHECIDOS ##################
 
-	def GetIsbnManning(pageSoup):
+	def GetIsbnManning(self, pageSoup):
 		try:
 			productInfo = pageSoup.find(class_="product-info")
 
@@ -122,7 +124,7 @@ class WebSearcher:
 		except:
 			return -1
 
-	def GetIsbnPacktpub(pageSoup):
+	def GetIsbnPacktpub(self, pageSoup):
 		try:
 			isbnString = pageSoup.find(itemprop="isbn").get_text()
 			isbnInt = int(re.search(r'\d+', isbnString).group())
@@ -130,7 +132,7 @@ class WebSearcher:
 		except:
 			return -1
 
-	def GetIsbnAmazon(pageSoup):
+	def GetIsbnAmazon(self, pageSoup):
 		try:
 			productInfo = pageSoup.find("table", id="productDetailsTable")
 			
@@ -144,7 +146,7 @@ class WebSearcher:
 		except:
 			return -1
 
-	def GetIsbnFundamentalKotlin(pageSoup):
+	def GetIsbnFundamentalKotlin(self, pageSoup):
 		try:
 			productInfo = pageSoup.find(class_="scondary_content")
 
@@ -154,7 +156,7 @@ class WebSearcher:
 		except:
 			return -1
 
-	def GetIsbnKuramkitap(pageSoup):
+	def GetIsbnKuramkitap(self, pageSoup):
 		try:
 			codeInfo = pageSoup.find(class_="table-row table-body-row prd_custom_fields_0")
 			codeText = codeInfo.get_text()
