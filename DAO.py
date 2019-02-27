@@ -1,6 +1,7 @@
 
 import sqlite3
 import os
+import json
 from WebSearcher import WebSearcher
 
 class DAO:
@@ -59,7 +60,7 @@ class DAO:
 		data = cursor.fetchall()
 		connect.close()
 
-		return data
+		return self.ListToJson(data)
 
 	def Get(self, isbn):
 		connect = sqlite3.connect('book.db')
@@ -67,7 +68,42 @@ class DAO:
 
 		sqlString = "SELECT * FROM BOOK WHERE isbn=" + str(isbn)
 		cursor.execute(sqlString)
-		data = cursor.fetchall()
+		data = cursor.fetchone()
 		connect.close()
 
-		return data
+		return self.ToJson(data)
+
+	def ToJson(self, data):
+		try:
+			toDict = self.ToDict(data)
+			return json.dumps(toDict)
+		except:
+			return ""
+
+	def ListToJson(self, data):
+		dataDict = {'numberBooks' : len(data)}
+
+		books = []
+		for book in data:
+			books.append(self.ToDict(book))
+
+		dataDict['books'] = books
+
+		return json.dumps(dataDict)
+
+	def ToDict(self, data):
+		toDict = {}
+		
+		try:
+			toDict['id'] = data[0]
+			toDict['isbn'] = data[1]
+			toDict['title'] = data[2]
+			toDict['description'] = data[3]
+			toDict['language'] = data[4]
+
+			return toDict
+
+		except:
+			return toDict
+
+		

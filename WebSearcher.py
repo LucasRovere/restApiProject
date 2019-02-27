@@ -71,8 +71,6 @@ class WebSearcher:
 		bookPage = requests.get(url, headers=headers, cookies=cookies)
 		bookSoup = BeautifulSoup(bookPage.content, 'html5lib')
 
-		print("Search at " + url)
-
 		if "manning" in url:
 			return self.GetIsbnManning(bookSoup)
 		if "leanpub" in url:
